@@ -54,12 +54,12 @@ RECHAZADO = "RECHAZADO"
 
 
 def pedir_usuario(usuarios):
-    nombre = input(" Ingresa tu nombre: ").lower()
+    nombre = input("\n Ingresa tu nombre: ").lower()
     if nombre in usuarios:
         print(f"Hola {nombre}")
         return nombre
     else:
-        print(" Usuario no encontrado")
+        print("Usuario no encontrado")
         return None
 
 
@@ -67,11 +67,11 @@ def pedir_dias():
     try:
         dias = int(input(" ¿Cuantos dias queres solicitar? "))
         if dias <= 0:
-            print(" Debe ser un numero mayor a 0")
+            print("Debe ser un numero mayor a 0")
             return None
         return dias
     except ValueError:
-        print(" Error, ingresa un numero valido")
+        print("Error, ingresa un numero valido")
         return None
 
 
@@ -91,7 +91,7 @@ def requiere_aprobacion(dias_solicitados):
 
 
 def aprobacion_jefe():
-    decision = input(" El jefe aprueba? (si/no): ").lower()
+    decision = input(" ¿El jefe aprueba? (si/no): ").lower()
     return decision == "si"
 
 
@@ -106,8 +106,8 @@ def chatbot():
     usuario = None
     dias_solicitados = 0
 
-    print(" Bienvenido al Bot de Vacaciones")
-    print("----------------------------------")
+    print("  Bienvenido al Bot de Vacaciones")
+    print("-----------------------------------")
 
     while True:
         if estado == INICIO:
@@ -118,7 +118,12 @@ def chatbot():
 
         elif estado == PEDIR_DIAS:
             dias_disponibles = obtener_dias_disponibles(usuario, usuarios)
-            print(f" Dias disponibles: {dias_disponibles}")
+            if dias_disponibles <= 0:
+                print("No tienes dias disponibles")
+                estado = INICIO
+                continue
+
+            print(f"Dias disponibles: {dias_disponibles}")
             
             dias = pedir_dias()
             if dias:
@@ -133,7 +138,7 @@ def chatbot():
 
         elif estado == APROBACION:
             if requiere_aprobacion(dias_solicitados):
-                print(" Se requiere aprobacion del jefe")
+                print("Se requiere aprobacion del jefe")
                 if aprobacion_jefe():
                     estado = APROBADO
                 else:
@@ -147,9 +152,8 @@ def chatbot():
                 guardar_usuarios(usuarios)
                 registrar_solicitud(usuario, dias_solicitados, "aprobado")
                 restantes = usuarios[usuario]["dias"]
-                print(" Solicitud APROBADA")
-                print(f" Dias restantes: {restantes}")
-                print(" Fin del proceso")
+                print("Solicitud APROBADA")
+                print(f"Dias restantes: {restantes}")
                 estado = INICIO
             else:
                 estado = INICIO
@@ -157,12 +161,16 @@ def chatbot():
 
 
         elif estado == RECHAZADO:
-            if dias_solicitados > 0:
-                registrar_solicitud(usuario, dias_solicitados, "rechazado")
-            print(" Solicitud RECHAZADA")
-            print(" Fin del proceso")
-            estado = INICIO
+            registrar_solicitud(usuario, dias_solicitados, "rechazado")
+            
+            dias_disponibles = obtener_dias_disponibles(usuario, usuarios)
+            if dias_solicitados > dias_disponibles:
+                print("No puedes solicitar más dias de los disponibles")
+                estado = "PEDIR_DIAS"
+            else:
+                estado = INICIO
 
+            print("Solicitud RECHAZADA")
 
 
 if __name__ == "__main__":
