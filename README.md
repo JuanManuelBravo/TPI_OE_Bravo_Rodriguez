@@ -41,16 +41,13 @@ El proceso fue modelado utilizando BPMN 2.0, incluyendo:
 
 ---
 
-##  **Estructura del Proyecto**
 
-(editar al concluir codigo) /*/
-
----
 
 ##  **Cómo ejecutar**
 
 1. Tener Python instalado
-(editar al concluir el codigo) /*/
+2. Abrir el main.py
+3. Ejecutar codigo
 
 
 
